@@ -367,6 +367,233 @@
         rug.position.y = 0.025; rug.position.z = -0.8; rug.receiveShadow = true;
         scene.add(rug);
 
+        // --- MESA DE CENTRO E ACESSÓRIOS ---
+        const tableGroup = new THREE.Group();
+        tableGroup.position.set(0, 0.35, 2.5);
+        scene.add(tableGroup);
+
+        const tableTopGeo = new THREE.BoxGeometry(4.5, 0.08, 1.4);
+        const tableTopMat = new THREE.MeshStandardMaterial({ color: 0x2a160b, roughness: 0.4, metalness: 0.2 });
+        const tableTop = new THREE.Mesh(tableTopGeo, tableTopMat);
+        tableTop.castShadow = true;
+        tableTop.receiveShadow = true;
+        tableGroup.add(tableTop);
+
+        const legGeo = new THREE.CylinderGeometry(0.04, 0.02, 0.31, 16);
+        const legMat = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.8, roughness: 0.4 });
+        const legPositions = [
+            [-2.0, -0.195, -0.5], [2.0, -0.195, -0.5],
+            [-2.0, -0.195, 0.5], [2.0, -0.195, 0.5]
+        ];
+        legPositions.forEach(pos => {
+            const leg = new THREE.Mesh(legGeo, legMat);
+            leg.position.set(pos[0], pos[1], pos[2]);
+            leg.castShadow = true;
+            tableGroup.add(leg);
+        });
+
+        // --- PLANTA PALIPALAN (Paepalanthus / Chuveirinho) ---
+        const potGeo = new THREE.CylinderGeometry(0.12, 0.09, 0.15, 16);
+        const potMat = new THREE.MeshStandardMaterial({ color: 0x8a5a44, roughness: 0.9 });
+        const pot = new THREE.Mesh(potGeo, potMat);
+        pot.position.set(1.4, 0.115, 0.15);
+        pot.castShadow = true;
+        tableGroup.add(pot);
+
+        const dirtGeo = new THREE.CylinderGeometry(0.11, 0.11, 0.02, 16);
+        const dirtMat = new THREE.MeshStandardMaterial({ color: 0x2b1c12, roughness: 1.0 });
+        const dirt = new THREE.Mesh(dirtGeo, dirtMat);
+        dirt.position.set(0, 0.07, 0);
+        pot.add(dirt);
+
+        const baseStemGeo = new THREE.CylinderGeometry(0.02, 0.035, 0.1, 8);
+        const baseStemMat = new THREE.MeshStandardMaterial({ color: 0xd28f5a, roughness: 0.9 });
+        const baseStem = new THREE.Mesh(baseStemGeo, baseStemMat);
+        baseStem.position.set(0, 0.12, 0);
+        pot.add(baseStem);
+
+        const stalksGroup = new THREE.Group();
+        stalksGroup.position.set(0, 0.05, 0);
+        baseStem.add(stalksGroup);
+
+        const stalkGeo = new THREE.CylinderGeometry(0.002, 0.003, 1, 4);
+        stalkGeo.rotateX(Math.PI / 2);
+        const stalkMat = new THREE.MeshStandardMaterial({ color: 0xb5b582, roughness: 0.8 });
+        const headGeo = new THREE.SphereGeometry(0.012, 8, 8);
+        const headMat = new THREE.MeshStandardMaterial({ color: 0xddddcc, roughness: 0.9 });
+        const dotGeo = new THREE.SphereGeometry(0.005, 4, 4);
+        const dotMat = new THREE.MeshBasicMaterial({ color: 0x222222 });
+
+        const numStalks = 180;
+        const goldenAngle = 2.39996323;
+        for (let i = 0; i < numStalks; i++) {
+            const t = i / (numStalks - 1);
+            const y = 1.0 - (t * 0.9);
+            const radius = Math.sqrt(1 - y * y);
+            const theta = goldenAngle * i;
+            const x = Math.cos(theta) * radius;
+            const z = Math.sin(theta) * radius;
+
+            const pivot = new THREE.Group();
+            const length = 0.4 + Math.random() * 0.1;
+
+            const stalk = new THREE.Mesh(stalkGeo, stalkMat);
+            stalk.scale.set(1, 1, length);
+            stalk.position.set(0, 0, length / 2);
+            pivot.add(stalk);
+
+            const headGroup = new THREE.Group();
+            headGroup.position.set(0, 0, length);
+            const head = new THREE.Mesh(headGeo, headMat);
+            head.scale.set(1, 0.7, 1);
+            headGroup.add(head);
+            const dot = new THREE.Mesh(dotGeo, dotMat);
+            dot.position.set(0, 0.01, 0);
+            headGroup.add(dot);
+            pivot.add(headGroup);
+
+            pivot.lookAt(new THREE.Vector3(x, y, z));
+            stalksGroup.add(pivot);
+        }
+
+        // Cinzeiro
+        const ashtrayGeo = new THREE.TorusGeometry(0.16, 0.05, 16, 32);
+        const ashtrayMat = new THREE.MeshStandardMaterial({ color: 0x050505, roughness: 0.1, metalness: 0.8 });
+        const ashtray = new THREE.Mesh(ashtrayGeo, ashtrayMat);
+        ashtray.position.set(0.6, 0.09, 0.3);
+        ashtray.rotation.x = Math.PI / 2;
+        ashtray.castShadow = true;
+        tableGroup.add(ashtray);
+
+        const ashtrayBase = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.02, 32), ashtrayMat);
+        ashtrayBase.position.set(0.6, 0.05, 0.3);
+        tableGroup.add(ashtrayBase);
+
+        // Cigarro
+        const cigGeo = new THREE.CylinderGeometry(0.012, 0.012, 0.15, 8);
+        const cigMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 });
+        const cig = new THREE.Mesh(cigGeo, cigMat);
+        cig.position.set(0.72, 0.14, 0.3);
+        cig.rotation.z = Math.PI / 2;
+        cig.rotation.y = Math.PI / 4;
+        cig.castShadow = true;
+        tableGroup.add(cig);
+
+        const tipGeo = new THREE.CylinderGeometry(0.013, 0.013, 0.02, 8);
+        const tipMat = new THREE.MeshStandardMaterial({ color: 0xff4400, emissive: 0xff2200, emissiveIntensity: 2.5 });
+        const tip = new THREE.Mesh(tipGeo, tipMat);
+        tip.position.set(-0.075, 0, 0);
+        cig.add(tip);
+
+        // Sistema de Fumaça
+        const smokeCount = 45;
+        const smokeGeo = new THREE.BufferGeometry();
+        const smokePos = new Float32Array(smokeCount * 3);
+        const smokeLife = new Float32Array(smokeCount);
+        for (let i = 0; i < smokeCount; i++) {
+            smokePos[i*3] = 0; smokePos[i*3+1] = 0; smokePos[i*3+2] = 0;
+            smokeLife[i] = Math.random();
+        }
+        smokeGeo.setAttribute('position', new THREE.BufferAttribute(smokePos, 3));
+        smokeGeo.setAttribute('life', new THREE.BufferAttribute(smokeLife, 1));
+
+        const smokeMat = new THREE.ShaderMaterial({
+            uniforms: {
+                time: { value: 0 },
+                smokeColor: { value: new THREE.Color(0xdddddd) }
+            },
+            vertexShader: `
+                attribute float life;
+                varying float vLife;
+                uniform float time;
+                void main() {
+                    vLife = life;
+                    float currentLife = fract(life + time * 0.15);
+                    vec3 pos = position;
+                    pos.y += currentLife * 1.5;
+                    pos.x += sin(currentLife * 4.0 + life * 10.0) * 0.2 * currentLife;
+                    pos.z += cos(currentLife * 3.0 + life * 10.0) * 0.2 * currentLife;
+                    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+                    gl_Position = projectionMatrix * mvPosition;
+                    gl_PointSize = (15.0 + currentLife * 40.0) * (3.0 / -mvPosition.z);
+                }
+            `,
+            fragmentShader: `
+                uniform vec3 smokeColor;
+                varying float vLife;
+                uniform float time;
+                void main() {
+                    float currentLife = fract(vLife + time * 0.15);
+                    vec2 coord = gl_PointCoord - vec2(0.5);
+                    float dist = length(coord);
+                    if (dist > 0.5) discard;
+                    float alpha = smoothstep(0.0, 0.1, currentLife) * (1.0 - smoothstep(0.2, 1.0, currentLife));
+                    alpha *= (1.0 - (dist * 2.0));
+                    gl_FragColor = vec4(smokeColor, alpha * 0.12);
+                }
+            `,
+            transparent: true,
+            depthWrite: false,
+            blending: THREE.NormalBlending
+        });
+        const smoke = new THREE.Points(smokeGeo, smokeMat);
+        smoke.position.set(0.65, 0.14, 0.23);
+        tableGroup.add(smoke);
+
+        // --- PILHA DE VINIS (LPs) ---
+        const vinylGroup = new THREE.Group();
+        vinylGroup.position.set(-1.2, 0.045, 0);
+        tableGroup.add(vinylGroup);
+
+        const vinylSize = 0.8;
+        const vinylThickness = 0.01;
+        const vinylGeo = new THREE.BoxGeometry(vinylSize, vinylThickness, vinylSize);
+        const vinylOffsets = [
+            { x: -0.15, z: -0.15, rot: -0.2,  color: '#4a2511' },
+            { x: 0.10,  z: -0.05, rot: 0.15,  color: '#1a332a' },
+            { x: -0.05, z: 0.10,  rot: -0.05, color: '#22223b' },
+            { x: 0.15,  z: 0.15,  rot: 0.25,  color: '#4a3b11' },
+            { x: 0.0,   z: 0.05,  rot: 0.0,   color: '#3b1122' }
+        ];
+
+        function createVinylCover(index, colorHex) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512; canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = colorHex;
+            ctx.fillRect(0, 0, 512, 512);
+            ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+            ctx.lineWidth = 15;
+            ctx.strokeRect(25, 25, 462, 462);
+            ctx.beginPath();
+            ctx.arc(256, 256, 180, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.font = 'bold 54px "Courier New"';
+            ctx.fillStyle = 'rgba(255,255,255,0.8)';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('CAPA ' + index, 256, 240);
+            ctx.font = '24px "Courier New"';
+            ctx.fillStyle = 'rgba(255,255,255,0.5)';
+            ctx.fillText('IMAGEM PLACEHOLDER', 256, 300);
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.colorSpace = THREE.SRGBColorSpace;
+            return tex;
+        }
+
+        for (let i = 0; i < 5; i++) {
+            const coverTexture = createVinylCover(i + 1, vinylOffsets[i].color);
+            const edgeMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 });
+            const coverMat = new THREE.MeshStandardMaterial({ map: coverTexture, roughness: 0.6 });
+            const materials = [edgeMat, edgeMat, coverMat, edgeMat, edgeMat, edgeMat];
+            const vinyl = new THREE.Mesh(vinylGeo, materials);
+            vinyl.position.set(vinylOffsets[i].x, i * vinylThickness, vinylOffsets[i].z);
+            vinyl.rotation.y = vinylOffsets[i].rot;
+            vinyl.castShadow = true;
+            vinyl.receiveShadow = true;
+            vinylGroup.add(vinyl);
+        }
+
         // --- CONSTRUÇÃO DO CONJUNTO (MÓVEL E TV) ---
         const tvGroup = new THREE.Group();
 
@@ -575,6 +802,7 @@
             const time = clock.getElapsedTime();
 
             if (rugMat.userData.shader) rugMat.userData.shader.uniforms.time.value = time;
+            smokeMat.uniforms.time.value = time;
             
             // Rotação suave do céu estrelado
             starField.rotation.y = time * 0.02;
